@@ -17,6 +17,8 @@
 
 """Module for drawing ASS structures to numpy bitmaps."""
 
+from __future__ import annotations
+
 import ctypes
 from fractions import Fraction
 from typing import Optional, Union
@@ -26,6 +28,12 @@ import PIL.Image
 from ass_parser import AssFile
 
 from ass_renderer import libass
+
+# For compatability with Pillow changes
+try:
+    _RESAMPLER = PIL.Image.LANCOS
+except AttributeError:
+    _RESAMPLER = PIL.Image.ANTIALIAS
 
 
 class AssRenderer:
@@ -120,7 +128,7 @@ class AssRenderer:
 
         ret = PIL.Image.fromarray(image_data)
         ret = ret.resize(
-            (int(ret.width * aspect_ratio), ret.height), PIL.Image.LANCZOS
+            (int(ret.width * aspect_ratio), ret.height), _RESAMPLER
         )
         final = PIL.Image.new("RGBA", self._renderer.frame_size)
         final.paste(ret, ((self._renderer.frame_size[0] - ret.width) // 2, 0))

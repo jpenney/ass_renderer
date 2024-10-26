@@ -22,16 +22,16 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.11"
-numpy = "^1.21.4"
-ass-parser = "^1.0"
-Pillow = "^8.4.0"
+python = ">=3.8"
+numpy = ">=1.21.4,<2"
+ass-parser = ">=1.0,<1.1"
+Pillow = ">=8.4.0,<10"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
-black = "^21.12b0"
+black = ">=21.12b0"
 pre-commit = "^2.16.0"
-isort = "^5.10.1"
+isort = ">=5.10.1, <5.14"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -46,3 +46,24 @@ known_first_party = "ass_renderer"
 known_third_party = "ass_parser"
 multi_line_output = 3
 include_trailing_comma = true
+
+[tool.mypy]
+strict = true
+disallow_untyped_decorators = false
+python_version = "3.8"
+
+[tool.pylint.message_control]
+disable = [
+    "import-error",  # for pre-commit, which cannot install external modules
+    "no-member",  # leave type checking to mypy
+    "signature-differs",  # leave type checking to mypy
+    "duplicate-code",
+    "too-few-public-methods",
+    "too-many-instance-attributes",
+
+    # Remove following after addressing?
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "too-many-locals",
+]

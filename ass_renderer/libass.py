@@ -15,24 +15,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=invalid-name
 # pylint: disable=protected-access
-
 import ctypes
 import ctypes.util
 import logging
+import os
 from collections.abc import Callable, Iterator
 from enum import IntEnum
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import ass_parser
 from ass_parser import write_ass
 
 logger = logging.getLogger(__name__)
 
-_libass_path = ctypes.util.find_library("ass") or ctypes.util.find_library(
-    "libass"
+_libass_path = (
+    ctypes.util.find_library("ass")
+    or ctypes.util.find_library("libass")
+    or os.environ.get("ASS_RENDERER_LIBASS_PATH")
 )
 assert _libass_path, "libass was not found"
 _libass = ctypes.cdll.LoadLibrary(_libass_path)
@@ -173,12 +177,12 @@ class AssLibrary(ctypes.Structure):
     def make_renderer(self) -> "AssRenderer":
         renderer = _libass.ass_renderer_init(ctypes.byref(self)).contents
         renderer._after_init(self)
-        return renderer
+        return cast(AssRenderer, renderer)
 
     def make_track(self) -> "AssTrack":
         track = _libass.ass_new_track(ctypes.byref(self)).contents
         track._after_init(self)
-        return track
+        return cast(AssTrack, track)
 
 
 class AssRenderer(ctypes.Structure):
